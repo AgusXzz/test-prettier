@@ -1,0 +1,40 @@
+name: Prettier Auto Fix
+
+on:
+  push:
+    branches: ["main"]   # setiap perubahan ke main, akan dicek
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Prettier (tanpa package.json)
+        run: npm install prettier
+
+      - name: Run Prettier
+        run: npx prettier --write .
+
+      - name: Check if there are changes
+        id: git_status
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request if changes exist
+        if: steps.git_status.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(prettier): auto format files"
+          branch: prettier-auto-fix
+          title: "Prettier Auto Fix"
+          body: "This PR contains automatic formatting changes."
+          labels: formatting
