@@ -42,7 +42,7 @@ function start(file) {
 					console.log('⏳ Auto restart...');
 					restart();
 				},
-				30 * 60 * 1000
+				30 * 60 * 1000,
 			);
 		}
 		watchFile(full, () => {
